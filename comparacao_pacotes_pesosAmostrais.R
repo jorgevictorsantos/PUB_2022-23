@@ -52,5 +52,7 @@ dadosPNADc %>%
 # 2183
 
 
-### CONSIDERAR SEMPRE A VARIÁVEL V1028, O PESO AMOSTRAL COM A ESTRATIFICAÇÃO PÓS COLETA
+### CONSIDERAR SEMPRE A VARIÁVEL V1028, Peso trimestral com correção de não 
+# entrevista com calibração pela projeção de população
+
 
