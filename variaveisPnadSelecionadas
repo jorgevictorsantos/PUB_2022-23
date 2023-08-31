@@ -1,19 +1,91 @@
 Variáveis selecionadas que nos importam
 
+# Identificação
 Ano,
 Trimestre,
 UF,
 Capital,
+UPA,
+Estrato,
+V1008   Número do domicílio
+V1014		Painel
 V1022		Situação do domicílio
 V1023		Tipo de área
-V1028		Peso do domicílio e das pessoas
+V1032		Peso do domicílio e das pessoas *com calibração*
+
+# Perfil
+V2005		Condição no domicílio
 V2007		Sexo
 V20082	Ano de nascimento
 V2009		Idade do morador na data de referência
 V2010		Cor ou raça
+
+### Educação
+
+V3009A	 Qual foi o curso mais elevado que ... frequentou anteriormente? -  4º tri/2015 - atual
+
+V3014		concluiu este curso que frequentou anteriormente
+
+VD3004	 Nível de instrução mais elevado alcançado (pessoas de 5 anos ou mais de idade) padronizado para o Ensino fundamental -  SISTEMA DE 9 ANOS
+
+VD3005		Anos de estudo (pessoas de 5 anos ou mais de idade) padronizado para o Ensino fundamental - SISTEMA DE 9 ANOS
+
+# Ocupação
+V4009		Quantos trabalhos ... tinha na semana de ... a ... (semana de referência ?
+
+V4010		Código da ocupação (cargo ou função)
+
+V4012		Nesse trabalho, ... era: (posição na ocupação)
+		
+V4013	Código da principal atividade desse negócio/empresa 
+
+V4014	Esse trabalho era na área:
+		
+V4016	Na semana de ... a ... (semana de referência), quantos empregados trabalhavam nesse negócio/empresa que ... tinha ?
+
+V4017	Na semana de ... a ... (semana de  referência), ... tinha pelo menos um sócio que trabalhava nesse negócio/empresa ?
+
+V4018	Na semana de ... a ... (semana de referência), contando com ... , quantas pessoas trabalhavam nesse negócio/empresa ?
+
+V4028	Nesse trabalho, ... era servidor público estatutário (federal, estadual ou municipal)?
+				
+V4029	Nesse trabalho, ... tinha carteira de trabalho assinada ?
+		
+V403311	Número da faixa do rendimento/retirada em dinheiro
+
+V403312	Qual era o rendimento bruto/retirada mensal que ... recebia/fazia normalmente nesse trabalho ? (valor em dinheiro)
+
+VD4001		Condição em relação à força de trabalho na semana de referência para pessoas de 14 anos ou mais de idade
+		
+VD4002		Condição de ocupação na semana de referência para pessoas de 14 anos ou mais de idade
+
+VD4003		Força de trabalho potencial para pessoas de 14 anos ou mais de idade
+				
+VD4007		Posição na ocupação no trabalho principal da semana de referência para pessoas de 14 anos ou mais de idade
+		
+VD4008		Posição na ocupação no trabalho principal da semana de referência para pessoas de 14 anos ou mais de idade (com subcategorias de empregados)
+
+VD4009		Posição na ocupação e categoria do emprego do trabalho principal da semana de referência para pessoas de 14 anos ou mais de idade
+		
+VD4016		Rendimento mensal habitual do trabalho principal para pessoas de 14 anos ou mais de idade (apenas para pessoas que receberam em dinheiro, produtos ou mercadorias no trabalho principal)
+		
+VD4017		Rendimento mensal efetivo do trabalho principal para pessoas de 14 anos ou mais de idade (apenas para pessoas que receberam em dinheiro, produtos ou mercadorias no trabalho principal)
+		
+
 		
 		
 		
+		
+		
+		
+		
+		
+
+		
+		
+		
+
+
 		
 		
 
