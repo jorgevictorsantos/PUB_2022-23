@@ -22,6 +22,8 @@ V2010		Cor ou raça
 
 ### Educação
 
+V3008 Estudou anteriormente?
+
 V3009A	 Qual foi o curso mais elevado que ... frequentou anteriormente? -  4º tri/2015 - atual
 
 V3014		concluiu este curso que frequentou anteriormente
@@ -66,6 +68,8 @@ VD4007		Posição na ocupação no trabalho principal da semana de referência p
 VD4008		Posição na ocupação no trabalho principal da semana de referência para pessoas de 14 anos ou mais de idade (com subcategorias de empregados)
 
 VD4009		Posição na ocupação e categoria do emprego do trabalho principal da semana de referência para pessoas de 14 anos ou mais de idade
+
+VD4010		Grupamentos de atividade principal do empreendimento do trabalho principal da semana de referência para pessoas de 14 anos ou mais de idade
 		
 VD4016		Rendimento mensal habitual do trabalho principal para pessoas de 14 anos ou mais de idade (apenas para pessoas que receberam em dinheiro, produtos ou mercadorias no trabalho principal)
 		
