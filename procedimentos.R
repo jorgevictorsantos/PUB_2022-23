@@ -2,8 +2,8 @@
 pacman::p_load(tidyverse, PNADcIBGE, pollster, matrixStats,
                descr, expss,cowplot,readxl,writexl,priceR)
 
-rm(list = ls())
-gc()
+# rm(list = ls())
+# gc()
 
 # variáveis utilizadas da PNAD ----
 vars <- c(
@@ -61,11 +61,12 @@ vars <- c(
   'VD4010',
   # atividades
   
-  'VD4016'
+  'VD4016',
   ##Rendimento mensal habitual do trabalho principal para pessoas de 14 anos ou mais de idade (apenas para pessoas que receberam em dinheiro, produtos ou mercadorias no trabalho principal)
+  
+  'CO2'
+  # deflator para rendimento habitual para o último ano
 )
-
-# pnad
 
 anos <- c(2016,2017,2018,2019,2022)
 
@@ -82,7 +83,8 @@ for (i in anos) {
   
   df <- get_pnadc(year = i, 
                   interview = 1,
-                  design = F)
+                  design = F,
+                  defyear = 2022)
   
   # recortes das variáveis e recorte das pessoas na força de trabalho, sejam 
   # ocupadas ou desocupadas
@@ -107,13 +109,11 @@ for (i in anos) {
                   by = c('V4010' = 'codigo'))
   
   df <- df %>%
-    mutate(interCultural = case_when(V4010 == '1222' ~ 1,V4010 == '2161' ~ 1,
-                                     V4010 == '2162' ~ 1,V4010 == '2163' ~ 1,
+    mutate(interCultural = case_when(V4010 == '2163' ~ 1,
                                      V4010 == '2166' ~ 1,V4010 == '2265' ~ 1,
                                      V4010 == '2431' ~ 1,V4010 == '2432' ~ 1,
                                      V4010 == '2621' ~ 1,V4010 == '2642' ~ 1,
-                                     V4010 == '2643' ~ 1,V4010 == '2656' ~ 1,
-                                     V4010 == '3230' ~ 1,V4010 == '3423' ~ 1,
+                                     V4010 == '2656' ~ 1,V4010 == '3423' ~ 1,
                                      V4010 == '3431' ~ 1,V4010 == '3432' ~ 1,
                                      V4010 == '3433' ~ 1,V4010 == '3434' ~ 1,
                                      V4010 == '3435' ~ 1,V4010 == '5113' ~ 1,
@@ -125,7 +125,7 @@ for (i in anos) {
                              V2010 == 'Parda' ~ 'Negros',
                              V2010 == 'Indígena' ~ NA,
                              V2010 == 'Amarela' ~ 'Amarelos'),
-           rendimento_mensal_hab_2022 = adjust_for_inflation(VD4016, Ano, "BR", to_date = 2022),
+           rendimento_mensal_hab_2022_IBGE = VD4016 * CO2,
            ensMedio = if_else((VD3004 == 'Médio completo ou equivalente' 
                                | VD3004 == 'Superior incompleto ou equivalente' 
                                | VD3004 == 'Superior completo'), 
@@ -152,11 +152,11 @@ for (i in anos) {
     filter(VD4002 == 'Pessoas ocupadas') %>% 
     mutate(n_ocupados = sum(V1032))
   
-  a <- c('não é inter cult', 'inter cult', 'total')
-  b <- descr::freq(df$interCultural2)
-  c <- descr::freq(df$interCultural2, w = df$V1032)
+  grupo <- c('não é inter cult', 'inter cult', 'total')
+  n_amostra <- descr::freq(df$interCultural2)
+  n_amostraPeso <- descr::freq(df$interCultural2, w = df$V1032)
   
-  amostra <- data.frame(a,b,c) 
+  amostra <- data.frame(grupo, n_amostra, n_amostraPeso) 
   
   amostra <- amostra %>%
     mutate(across(where(is.numeric), round, digits = 2))
@@ -445,9 +445,9 @@ for (i in anos) {
     reframe(V4010 = NA,
             titulo = NA, 
             grupo = 'geral',
-            mediaRenda = weightedMean(rendimento_mensal_hab_2022, w = V1032, na.rm = T),
-            medianaRenda = weightedMedian(rendimento_mensal_hab_2022,w = V1032, na.rm = T),
-            desvioRenda = weightedSd(rendimento_mensal_hab_2022,w = V1032, na.rm = T),
+            mediaRenda = weightedMean(rendimento_mensal_hab_2022_IBGE, w = V1032, na.rm = T),
+            medianaRenda = weightedMedian(rendimento_mensal_hab_2022_IBGE,w = V1032, na.rm = T),
+            desvioRenda = weightedSd(rendimento_mensal_hab_2022_IBGE,w = V1032, na.rm = T),
             nAmostra = n(),
             nPeso = sum(V1032),
             ano = i) %>%
@@ -461,9 +461,9 @@ for (i in anos) {
     reframe(V4010 = NA,
             titulo = NA, 
             grupo = 'Intermediários culturais',
-            mediaRenda = weightedMean(rendimento_mensal_hab_2022, w = V1032, na.rm = T),
-            medianaRenda = weightedMedian(rendimento_mensal_hab_2022,w = V1032, na.rm = T),
-            desvioRenda = weightedSd(rendimento_mensal_hab_2022,w = V1032, na.rm = T),
+            mediaRenda = weightedMean(rendimento_mensal_hab_2022_IBGE, w = V1032, na.rm = T),
+            medianaRenda = weightedMedian(rendimento_mensal_hab_2022_IBGE,w = V1032, na.rm = T),
+            desvioRenda = weightedSd(rendimento_mensal_hab_2022_IBGE,w = V1032, na.rm = T),
             nAmostra = n(),
             nPeso = sum(V1032),
             ano = i) %>%
@@ -477,9 +477,9 @@ for (i in anos) {
     filter(interCultural == 1) %>% 
     group_by(V4010, titulo) %>% 
     reframe(grupo = 'ocupações da categoria',
-            mediaRenda = weightedMean(rendimento_mensal_hab_2022, w = V1032, na.rm = T),
-            medianaRenda = weightedMedian(rendimento_mensal_hab_2022,w = V1032, na.rm = T),
-            desvioRenda = weightedSd(rendimento_mensal_hab_2022,w = V1032, na.rm = T),
+            mediaRenda = weightedMean(rendimento_mensal_hab_2022_IBGE, w = V1032, na.rm = T),
+            medianaRenda = weightedMedian(rendimento_mensal_hab_2022_IBGE, w = V1032, na.rm = T),
+            desvioRenda = weightedSd(rendimento_mensal_hab_2022_IBGE, w = V1032, na.rm = T),
             nAmostra = n(),
             nPeso = sum(V1032),
             ano = i)
@@ -684,13 +684,98 @@ for (i in anos) {
 }
 
 
+# 9 - Agregações dos resultados -----
 
 
+### amostra ----
+
+amostra_Pnad2016$ano <- 2016
+amostra_Pnad2017$ano <- 2017
+amostra_Pnad2018$ano <- 2018
+amostra_Pnad2019$ano <- 2019
+amostra_Pnad2022$ano <- 2022
+
+rbind(amostra_Pnad2016,
+      amostra_Pnad2017, amostra_Pnad2018, amostra_Pnad2019, amostra_Pnad2022)
+
+amostraGeral <- rbind(amostra_Pnad2016,
+                      amostra_Pnad2017, amostra_Pnad2018, amostra_Pnad2019, amostra_Pnad2022)
 
 
+write_xlsx(amostraGeral, 'amostraGeral.xlsx')
 
 
+### sexo -----
+
+sexoGeral <- rbind(sexoGeral_Pnad2016, sexoGeral_Pnad2017, sexoGeral_Pnad2018,
+                   sexoGeral_Pnad2019, sexoGeral_Pnad2022)
+
+sexoClasse_Pnad2016$ano <- 2016
+sexoClasse_Pnad2017$ano <- 2017
+sexoClasse_Pnad2018$ano <- 2018
+sexoClasse_Pnad2019$ano <- 2019
+sexoClasse_Pnad2022$ano <- 2022
+
+sexoClasse <- rbind(sexoClasse_Pnad2016, sexoClasse_Pnad2017, sexoClasse_Pnad2018,
+                    sexoClasse_Pnad2019, sexoClasse_Pnad2022)
+
+sexoGeralClasse <- cbind(sexoGeral, sexoClasse)
+
+write_xlsx(sexoGeralClasse, 'sexoGeralClasse.xlsx')
 
 
+sexoOcupClasse_Pnad2016$ano <- 2016
+sexoOcupClasse_Pnad2017$ano <- 2017
+sexoOcupClasse_Pnad2018$ano <- 2018
+sexoOcupClasse_Pnad2019$ano <- 2019
+sexoOcupClasse_Pnad2022$ano <- 2022
 
+
+sexoOcupClasse <- rbind(sexoOcupClasse_Pnad2016, sexoOcupClasse_Pnad2017,
+                        sexoOcupClasse_Pnad2018,sexoOcupClasse_Pnad2019,
+                        sexoOcupClasse_Pnad2022)
+
+sexoOcupClasse <- as.data.frame(sexoOcupClasse)
+
+class(sexoOcupClasse)
+
+write_xlsx(sexoOcupClasse, 'sexoOcupClasse.xlsx')
+
+### raça -----
+
+racaGeral_Pnad2016
+
+racaGeral <- rbind(racaGeral_Pnad2016,racaGeral_Pnad2017,racaGeral_Pnad2018,
+                   racaGeral_Pnad2019,racaGeral_Pnad2022)
+
+racaClasse_Pnad2016$ano  <- 2016
+racaClasse_Pnad2017$ano  <- 2017
+racaClasse_Pnad2018$ano  <- 2018
+racaClasse_Pnad2019$ano  <- 2019
+racaClasse_Pnad2022$ano  <- 2022
+
+racaClasse <- rbind(racaClasse_Pnad2016,racaClasse_Pnad2017,racaClasse_Pnad2018,
+                    racaClasse_Pnad2019, racaClasse_Pnad2022)
+
+racaClasseGeral <- cbind(racaGeral, racaClasse)
+  
+write_xlsx(racaClasseGeral, 'racaClasseGeral.xlsx')
+  
+  
+  
+racaOcupClasse_Pnad2016$ano <- 2016
+racaOcupClasse_Pnad2017$ano <- 2017
+racaOcupClasse_Pnad2018$ano <- 2018
+racaOcupClasse_Pnad2019$ano <- 2019
+racaOcupClasse_Pnad2022$ano <- 2022
+
+
+racaOcupClasse <- rbind(racaOcupClasse_Pnad2016,racaOcupClasse_Pnad2017,
+                        racaOcupClasse_Pnad2018,racaOcupClasse_Pnad2019,
+                        racaOcupClasse_Pnad2022)
+
+write_xlsx(racaOcupClasse, 'racaOcupClasse.xlsx')
+  
+
+### idade
 
