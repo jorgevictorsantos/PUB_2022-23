@@ -2,9 +2,6 @@
 pacman::p_load(tidyverse, PNADcIBGE, pollster, matrixStats,
                descr, expss,cowplot,readxl,writexl,priceR)
 
-# rm(list = ls())
-# gc()
-
 # variáveis utilizadas da PNAD ----
 vars <- c(
   'Ano','Trimestre','UF','Capital','UPA','Estrato',
@@ -778,4 +775,19 @@ write_xlsx(racaOcupClasse, 'racaOcupClasse.xlsx')
   
 
 ### idade
+
+
+idadeGeral <- rbind(idade_Pnad2016, idade_Pnad2017, idade_Pnad2018,
+                    idade_Pnad2019, idade_Pnad2022)
+
+idadeGeral
+
+write_xlsx(idadeGeral, 'idadeGeral.xlsx')
+
+
+
+
+
+
+
 
