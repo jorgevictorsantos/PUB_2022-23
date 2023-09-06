@@ -106,14 +106,13 @@ for (i in anos) {
                   by = c('V4010' = 'codigo'))
   
   df <- df %>%
-    mutate(interCultural = case_when(V4010 == '2163' ~ 1,
-                                     V4010 == '2166' ~ 1,V4010 == '2265' ~ 1,
+    mutate(interCultural = case_when(V4010 == '2163' ~ 1,V4010 == '2166' ~ 1,
                                      V4010 == '2431' ~ 1,V4010 == '2432' ~ 1,
                                      V4010 == '2621' ~ 1,V4010 == '2642' ~ 1,
                                      V4010 == '2656' ~ 1,V4010 == '3423' ~ 1,
                                      V4010 == '3431' ~ 1,V4010 == '3432' ~ 1,
                                      V4010 == '3433' ~ 1,V4010 == '3434' ~ 1,
-                                     V4010 == '3435' ~ 1,V4010 == '5113' ~ 1,
+                                     V4010 == '4221' ~ 1,V4010 == '5113' ~ 1,
                                      .default = 0),
            interCultural2 = case_when(interCultural == 0 ~ 'Não',
                                       interCultural == 1 ~ 'Sim'),
@@ -145,6 +144,7 @@ for (i in anos) {
   
   cat('Feitas as transformações e recategorizações da Pnad:', i, '\n')
   
+  # 2.1 Amostra e ocupados -----
   df_ocupados <- df %>% 
     filter(VD4002 == 'Pessoas ocupadas') %>% 
     mutate(n_ocupados = sum(V1032))
@@ -156,7 +156,8 @@ for (i in anos) {
   amostra <- data.frame(grupo, n_amostra, n_amostraPeso) 
   
   amostra <- amostra %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('amostra_Pnad',i), amostra)
   
@@ -176,8 +177,8 @@ for (i in anos) {
                      y = V2007,
                      w = V1032,
                      unwt_n = T) %>%
-    mutate(ano = i) %>% 
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('sexoGeral_Pnad',i), sexoGeral)
   
@@ -191,7 +192,8 @@ for (i in anos) {
                        w = V1032,
                        unwt_n = T) %>%
     filter(interCultural2 == 'Sim') %>% 
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('sexoClasse_Pnad',i), sexoClasse)
   
@@ -210,7 +212,8 @@ for (i in anos) {
     left_join(x = .,
               y = ocupacoesCOD,
               by = 'codigo') %>% 
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('sexoOcupClasse_Pnad',i), sexoOcupClasse)
   
@@ -226,8 +229,8 @@ for (i in anos) {
                      y = raca2,
                      w = V1032,
                      unwt_n = T) %>% 
-    mutate(ano = i) %>% 
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('racaGeral_Pnad',i), racaGeral)
   
@@ -241,7 +244,8 @@ for (i in anos) {
                        w = V1032,
                        unwt_n = T) %>%
     filter(interCultural2 == 'Sim') %>% 
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('racaClasse_Pnad',i), racaClasse)
   
@@ -260,7 +264,8 @@ for (i in anos) {
     left_join(x = .,
               y = ocupacoesCOD,
               by = 'codigo') %>% 
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('racaOcupClasse_Pnad',i), racaOcupClasse)
   
@@ -275,8 +280,8 @@ for (i in anos) {
   idadeGeral <- df %>% 
     reframe(mediaIdadeGeral = weightedMean(x = V2009, w = V1032),
             medianaIdadeGeral = weightedMedian(x = V2009, w = V1032)) %>% 
-    mutate(across(where(is.numeric), round, digits = 2)) %>% 
-    mutate(ano = i)
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   
   # na classe dos inter cultural
@@ -304,8 +309,8 @@ for (i in anos) {
                      y = VD4002,
                      weight = V1032,
                      unwt_n = T) %>% 
-    mutate(ano = i) %>% 
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   assign(paste0('ocupadosGeral_Pnad',i),ocupadosGeral)
   
@@ -318,8 +323,8 @@ for (i in anos) {
                        weight = V1032,
                        unwt_n = T) %>% 
     filter(interCultural == 1) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   assign(paste0('ocupadosClasse_Pnad',i),ocupadosClasse)
   
@@ -332,8 +337,8 @@ for (i in anos) {
     reframe(n_ocupados2 = sum(V1032)) %>% 
     mutate(pct_ocupados = n_ocupados2/n_ocupados) %>% 
     filter(interCultural2 == 'Sim') %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   assign(paste0('ClassePEA_Pnad',i),pct_classe_PEA)
   
@@ -353,8 +358,8 @@ for (i in anos) {
                                       x = VD4001,
                                       y = VD4009,
                                       w = V1032) %>%
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('posiOcupGeral_Pnad',i),posiOcupGeral)
   
@@ -368,7 +373,8 @@ for (i in anos) {
                        w = V1032,
                        unwt_n = T) %>% 
     filter(interCultural2 == 'Sim') %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('posiOcupClasse_Pnad',i),posiOcupClasse)
   
@@ -382,14 +388,14 @@ for (i in anos) {
                        y = VD4009,
                        w = V1032,
                        unwt_n = T) %>% 
-    mutate(codigo = as.character(V4010),
-           ano = i) %>% 
+    mutate(codigo = as.character(V4010)) %>% 
     left_join(x = .,
               y = ocupacoesCOD,
               by = 'codigo') %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
-  assign(paste0('posiOcupClasseOcupacoes_Pnad',i),posiOcupClasse)
+  assign(paste0('posiOcupClasseOcupacoes_Pnad',i),posiOcupClasseOcupacoes)
   
   write_xlsx(posiOcupClasseOcupacoes, paste0('posiOcupClasseOcupacoesPNAD',i,'.xlsx'))
   
@@ -407,8 +413,8 @@ for (i in anos) {
                        y = VD4010,
                        w = V1032,
                        unwt_n = T) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('distCNAEgeral',i),distCNAEgeral)
   
@@ -423,8 +429,8 @@ for (i in anos) {
                        w = V1032,
                        unwt_n = T) %>% 
     filter(interCultural == 1) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   assign(paste0('distCNAEclasse',i),distCNAEclasse)
   
@@ -479,7 +485,8 @@ for (i in anos) {
             desvioRenda = weightedSd(rendimento_mensal_hab_2022_IBGE, w = V1032, na.rm = T),
             nAmostra = n(),
             nPeso = sum(V1032),
-            ano = i)
+            ano = i) %>%
+    mutate(across(where(is.numeric), round, digits = 2))
   
   assign(paste0('rendaPnad',i), rbind(rendaGeral, rendaClasse, rendaOcupacoes))
   
@@ -498,38 +505,40 @@ for (i in anos) {
              y = ensMedio,
              w = V1032,
              unwt_n = T) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(across(where(is.numeric), round, digits = 2),
+           ano = i)
   
   ensSuperiorGeral <- df %>% 
     pollster::crosstab(x = VD4001,
              y = ensSuperior,
              w = V1032,
              unwt_n = T) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   posgradGeral <- df %>% 
     pollster::crosstab(x = VD4001,
              y = posgraduacao,
              w = V1032,
-             unwt_n = T) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+             unwt_n = T) %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   posGradLatoGeral <- df %>% 
     pollster::crosstab(x = VD4001,
              y = posgrad_lato,
              w = V1032,
-             unwt_n = T) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+             unwt_n = T) %>% 
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   posGradStrictoGeral <- df %>% 
     pollster::crosstab(x = VD4001,
              y = posgrad_stricto,
              w = V1032,
-             unwt_n = T) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+             unwt_n = T) %>% 
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   escolaridadeGeral <- cbind(ensMedioGeral, ensSuperiorGeral, posgradGeral,
         posGradLatoGeral, posGradStrictoGeral)
@@ -546,45 +555,45 @@ for (i in anos) {
              y = ensMedio,
              w = V1032,
              unwt_n = T) %>% 
-    filter(interCultural == 1) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    filter(interCultural == 1) %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   ensSupClasse <- df %>% 
     pollster::crosstab(x = interCultural,
              y = ensSuperior,
              w = V1032,
              unwt_n = T)%>% 
-    filter(interCultural == 1) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    filter(interCultural == 1) %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   posgradClasse <- df %>% 
     pollster::crosstab(x = interCultural,
              y = posgraduacao,
              w = V1032,
              unwt_n = T)%>% 
-    filter(interCultural == 1) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    filter(interCultural == 1) %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   posGradLatoClasse <- df %>% 
     pollster::crosstab(x = interCultural,
              y = posgrad_lato,
              w = V1032,
              unwt_n = T)%>% 
-    filter(interCultural == 1) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    filter(interCultural == 1) %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   posGradStrictoClasse <- df %>% 
     pollster::crosstab(x = interCultural,
              y = posgrad_stricto,
              w = V1032,
              unwt_n = T)%>% 
-    filter(interCultural == 1) %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+    filter(interCultural == 1) %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   escolaridadeClasse <- cbind(ensMedioClasse, ensSupClasse, posgradClasse,
                              posGradLatoClasse, posGradStrictoClasse)
@@ -605,9 +614,9 @@ for (i in anos) {
     mutate(codigo = as.character(V4010)) %>% 
     left_join(x = .,
               y = ocupacoesCOD,
-              by = 'codigo') %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+              by = 'codigo') %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   ensSuperiorOcupacoes <- df %>%
     filter(interCultural == 1) %>% 
@@ -618,9 +627,9 @@ for (i in anos) {
     mutate(codigo = as.character(V4010)) %>% 
     left_join(x = .,
               y = ocupacoesCOD,
-              by = 'codigo') %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+              by = 'codigo') %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   posgradOcupacoes <- df %>%
     filter(interCultural == 1) %>% 
@@ -631,9 +640,9 @@ for (i in anos) {
     mutate(codigo = as.character(V4010)) %>% 
     left_join(x = .,
               y = ocupacoesCOD,
-              by = 'codigo') %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+              by = 'codigo') %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   posGradLatoOcupacoes <- df %>%
     filter(interCultural == 1) %>% 
@@ -644,9 +653,9 @@ for (i in anos) {
     mutate(codigo = as.character(V4010)) %>% 
     left_join(x = .,
               y = ocupacoesCOD,
-              by = 'codigo') %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+              by = 'codigo') %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
   
   posGradStrictoOcupacoes <- df %>%
     filter(interCultural == 1) %>% 
@@ -657,9 +666,9 @@ for (i in anos) {
     mutate(codigo = as.character(V4010)) %>% 
     left_join(x = .,
               y = ocupacoesCOD,
-              by = 'codigo') %>% 
-    mutate(ano = i) %>%
-    mutate(across(where(is.numeric), round, digits = 2))
+              by = 'codigo') %>%  
+    mutate(ano = i,
+           across(where(is.numeric), round, digits = 2))
 
   escolaridadeOcupacoes <- cbind(ensMedioOcupacoes, ensSuperiorOcupacoes, 
                                  posgradOcupacoes, posGradLatoOcupacoes, 
@@ -684,16 +693,7 @@ for (i in anos) {
 # 9 - Agregações dos resultados -----
 
 
-### amostra ----
-
-amostra_Pnad2016$ano <- 2016
-amostra_Pnad2017$ano <- 2017
-amostra_Pnad2018$ano <- 2018
-amostra_Pnad2019$ano <- 2019
-amostra_Pnad2022$ano <- 2022
-
-rbind(amostra_Pnad2016,
-      amostra_Pnad2017, amostra_Pnad2018, amostra_Pnad2019, amostra_Pnad2022)
+### 9.1 amostra ----
 
 amostraGeral <- rbind(amostra_Pnad2016,
                       amostra_Pnad2017, amostra_Pnad2018, amostra_Pnad2019, amostra_Pnad2022)
@@ -702,16 +702,11 @@ amostraGeral <- rbind(amostra_Pnad2016,
 write_xlsx(amostraGeral, 'amostraGeral.xlsx')
 
 
-### sexo -----
+### 9.2 sexo -----
 
 sexoGeral <- rbind(sexoGeral_Pnad2016, sexoGeral_Pnad2017, sexoGeral_Pnad2018,
                    sexoGeral_Pnad2019, sexoGeral_Pnad2022)
 
-sexoClasse_Pnad2016$ano <- 2016
-sexoClasse_Pnad2017$ano <- 2017
-sexoClasse_Pnad2018$ano <- 2018
-sexoClasse_Pnad2019$ano <- 2019
-sexoClasse_Pnad2022$ano <- 2022
 
 sexoClasse <- rbind(sexoClasse_Pnad2016, sexoClasse_Pnad2017, sexoClasse_Pnad2018,
                     sexoClasse_Pnad2019, sexoClasse_Pnad2022)
@@ -721,35 +716,17 @@ sexoGeralClasse <- cbind(sexoGeral, sexoClasse)
 write_xlsx(sexoGeralClasse, 'sexoGeralClasse.xlsx')
 
 
-sexoOcupClasse_Pnad2016$ano <- 2016
-sexoOcupClasse_Pnad2017$ano <- 2017
-sexoOcupClasse_Pnad2018$ano <- 2018
-sexoOcupClasse_Pnad2019$ano <- 2019
-sexoOcupClasse_Pnad2022$ano <- 2022
-
-
 sexoOcupClasse <- rbind(sexoOcupClasse_Pnad2016, sexoOcupClasse_Pnad2017,
                         sexoOcupClasse_Pnad2018,sexoOcupClasse_Pnad2019,
                         sexoOcupClasse_Pnad2022)
 
-sexoOcupClasse <- as.data.frame(sexoOcupClasse)
-
-class(sexoOcupClasse)
-
 write_xlsx(sexoOcupClasse, 'sexoOcupClasse.xlsx')
 
-### raça -----
+### 9.3 raça -----
 
-racaGeral_Pnad2016
 
 racaGeral <- rbind(racaGeral_Pnad2016,racaGeral_Pnad2017,racaGeral_Pnad2018,
                    racaGeral_Pnad2019,racaGeral_Pnad2022)
-
-racaClasse_Pnad2016$ano  <- 2016
-racaClasse_Pnad2017$ano  <- 2017
-racaClasse_Pnad2018$ano  <- 2018
-racaClasse_Pnad2019$ano  <- 2019
-racaClasse_Pnad2022$ano  <- 2022
 
 racaClasse <- rbind(racaClasse_Pnad2016,racaClasse_Pnad2017,racaClasse_Pnad2018,
                     racaClasse_Pnad2019, racaClasse_Pnad2022)
@@ -758,15 +735,6 @@ racaClasseGeral <- cbind(racaGeral, racaClasse)
   
 write_xlsx(racaClasseGeral, 'racaClasseGeral.xlsx')
   
-  
-  
-racaOcupClasse_Pnad2016$ano <- 2016
-racaOcupClasse_Pnad2017$ano <- 2017
-racaOcupClasse_Pnad2018$ano <- 2018
-racaOcupClasse_Pnad2019$ano <- 2019
-racaOcupClasse_Pnad2022$ano <- 2022
-
-
 racaOcupClasse <- rbind(racaOcupClasse_Pnad2016,racaOcupClasse_Pnad2017,
                         racaOcupClasse_Pnad2018,racaOcupClasse_Pnad2019,
                         racaOcupClasse_Pnad2022)
@@ -774,7 +742,7 @@ racaOcupClasse <- rbind(racaOcupClasse_Pnad2016,racaOcupClasse_Pnad2017,
 write_xlsx(racaOcupClasse, 'racaOcupClasse.xlsx')
   
 
-### idade
+### 9.4 idade ----
 
 
 idadeGeral <- rbind(idade_Pnad2016, idade_Pnad2017, idade_Pnad2018,
@@ -785,9 +753,42 @@ idadeGeral
 write_xlsx(idadeGeral, 'idadeGeral.xlsx')
 
 
+### 9.5. participação PEA ----
+
+ocupadosGeral <- rbind(ocupadosGeral_Pnad2016, ocupadosGeral_Pnad2017,
+                       ocupadosGeral_Pnad2018, ocupadosGeral_Pnad2019,
+                       ocupadosGeral_Pnad2022)
+
+write_xlsx(ocupadosGeral, 'ocupadosGeral.xlsx')
 
 
+ocupadosClasse <- rbind(ocupadosClasse_Pnad2016,ocupadosClasse_Pnad2017,
+                        ocupadosClasse_Pnad2018,ocupadosClasse_Pnad2019,
+                        ocupadosClasse_Pnad2022)
+
+ocupadosTodos <- cbind(ocupadosGeral, ocupadosClasse)
 
 
+ClassePEA <- rbind(ClassePEA_Pnad2016,ClassePEA_Pnad2017,ClassePEA_Pnad2018,
+                   ClassePEA_Pnad2019,ClassePEA_Pnad2022)
+
+
+### 9.6. Situação empregatícia - Posição na ocupação ----
+
+
+posiOcupGeral <- rbind(posiOcupGeral_Pnad2016,posiOcupGeral_Pnad2017,
+                       posiOcupGeral_Pnad2018,posiOcupGeral_Pnad2019,
+                       posiOcupGeral_Pnad2022)
+
+
+posiOcupClasseTotal <- rbind(posiOcupClasse_Pnad2016,posiOcupClasse_Pnad2017,
+                             posiOcupClasse_Pnad2018,posiOcupClasse_Pnad2019,
+                             posiOcupClasse_Pnad2022)
+
+# posiOcupClasseOcupacoesTotal <- cbind(posiOcupClasseOcupacoes_Pnad2016,
+#                                       posiOcupClasseOcupacoes_Pnad2017,
+#                                       posiOcupClasseOcupacoes_Pnad2018,
+#                                       posiOcupClasseOcupacoes_Pnad2019,
+#                                       posiOcupClasseOcupacoes_Pnad2022)
 
 
